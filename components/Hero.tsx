@@ -4,6 +4,7 @@ import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowDown, Github, Linkedin, FileText, ChevronRight } from 'lucide-react';
 import { useScrollTo } from '@/lib/use-scroll-to';
+import ElectricBorder from './ElectricBorder';
 
 const headingContainerVariants = {
   hidden: {},
@@ -43,11 +44,29 @@ export default function Hero() {
     offset: ["start start", "end start"]
   });
 
-  // Calculate high-end scroll-bound offsets
-  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "80%"]);
-  const textScale = useTransform(scrollYProgress, [0, 0.8], [1, 0.85]);
-  const textOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  // Per-word exit offsets — each word lifts off at a slightly different rate
+  // for a cinematic "stagger-rising" reveal as the user scrolls out of the hero.
+  const word1Y = useTransform(scrollYProgress, [0, 0.6], ['0%', '-180%']);
+  const word2Y = useTransform(scrollYProgress, [0, 0.7], ['0%', '-220%']);
+  const word3Y = useTransform(scrollYProgress, [0, 0.8], ['0%', '-260%']);
+
+  // Horizontal slide-off: BUILDING slides left and disappears first, then
+  // INTELLIGENT, then SYSTEMS — creating a left-exit cascade.
+  const word1X = useTransform(scrollYProgress, [0, 0.55], ['0%', '-120%']);
+  const word2X = useTransform(scrollYProgress, [0, 0.7], ['0%', '-140%']);
+  const word3X = useTransform(scrollYProgress, [0, 0.85], ['0%', '-160%']);
+  const word1Rotate = useTransform(scrollYProgress, [0, 0.55], [0, -8]);
+  const word2Rotate = useTransform(scrollYProgress, [0, 0.7], [0, -10]);
+  const word3Rotate = useTransform(scrollYProgress, [0, 0.85], [0, -12]);
+  const word1Opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const word2Opacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
+  const word3Opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+
+  // Whole headline envelope drifts up + scales down + fades together.
+  const textY = useTransform(scrollYProgress, [0, 1], ['0%', '-40%']);
+  const textScale = useTransform(scrollYProgress, [0, 0.8], [1, 0.9]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
+  const imageY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
   const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
 
   const scrollTo = useScrollTo();
@@ -148,7 +167,7 @@ export default function Hero() {
             style={{ y: textY, scale: textScale, opacity: textOpacity }}
             className="mb-8"
           >
-            <motion.h1 
+            <motion.h1
               variants={headingContainerVariants}
               initial="hidden"
               animate="visible"
@@ -156,24 +175,27 @@ export default function Hero() {
               style={{ perspective: 1000 }}
             >
               <span className="block overflow-hidden py-1">
-                <motion.span 
-                  variants={wordVariants} 
+                <motion.span
+                  variants={wordVariants}
+                  style={{ y: word1Y, x: word1X, rotate: word1Rotate, opacity: word1Opacity }}
                   className="block origin-left"
                 >
                   BUILDING
                 </motion.span>
               </span>
               <span className="block overflow-hidden py-1">
-                <motion.span 
-                  variants={wordVariants} 
+                <motion.span
+                  variants={wordVariants}
+                  style={{ y: word2Y, x: word2X, rotate: word2Rotate, opacity: word2Opacity }}
                   className="block text-stroke text-stroke-hover origin-left"
                 >
                   INTELLIGENT
                 </motion.span>
               </span>
               <span className="block overflow-hidden py-1">
-                <motion.span 
-                  variants={wordVariants} 
+                <motion.span
+                  variants={wordVariants}
+                  style={{ y: word3Y, x: word3X, rotate: word3Rotate, opacity: word3Opacity }}
                   className="block text-[#FF5C00] flex items-center gap-2 origin-left"
                 >
                   SYSTEMS
@@ -265,50 +287,61 @@ export default function Hero() {
           {/* Complex backdrop warm glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full sunset-glow-strong opacity-45 blur-2xl pointer-events-none" />
 
-          {/* Portrait Container */}
+          {/* Portrait Container wrapped in ElectricBorder */}
           <motion.div
             style={{ y: imageY, scale: imageScale }}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-72 sm:w-80 lg:w-full max-w-[360px] aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 group shadow-2xl shadow-black/80"
+            className="relative w-72 sm:w-80 lg:w-full max-w-[360px] aspect-[3/4] group shadow-2xl shadow-black/80"
           >
-            {/* Subtle glow rim lighting border */}
-            <div className="absolute inset-0 border border-transparent group-hover:border-[#FF5C00]/20 rounded-2xl pointer-events-none transition-all duration-700 z-30" />
-            
-            {/* Warm Sunset/Cyberpunk Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#FF5C00]/5 to-transparent mix-blend-color-dodge opacity-60 z-10 transition-opacity duration-500 group-hover:opacity-80" />
-            
-            {/* Noise texture specifically inside frame */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,92,0,0.1),transparent_50%)] z-10" />
+            <ElectricBorder
+              color="#FF5C00"
+              speed={1.3}
+              chaos={0.11}
+              thickness={2}
+              borderRadius={16}
+              className="w-full h-full"
+            >
+              <div className="relative w-full h-full rounded-2xl overflow-hidden border border-white/10 bg-[#050505]">
+                {/* Subtle glow rim lighting border */}
+                <div className="absolute inset-0 border border-transparent group-hover:border-[#FF5C00]/20 rounded-2xl pointer-events-none transition-all duration-700 z-30" />
 
-            {/* Profile image with subtle floating animation and failover placeholder */}
-            <div className="w-full h-full relative z-0 scale-100 transition-all duration-1000 group-hover:scale-105">
-              <img
-                src="/portrait.jpg"
-                alt="Shah Makhdum — Software & AI Engineer"
-                loading="eager"
-                decoding="async"
-                className="w-full h-full object-cover filter grayscale contrast-110 brightness-90 group-hover:grayscale-0 transition-all duration-700"
-                onError={(e) => {
-                  // Last-resort fallback if /portrait.jpg is ever missing or blocked
-                  const target = e.target as HTMLImageElement;
-                  target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800&h=1000";
-                }}
-              />
-            </div>
+                {/* Warm Sunset/Cyberpunk Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#FF5C00]/5 to-transparent mix-blend-color-dodge opacity-60 z-10 transition-opacity duration-500 group-hover:opacity-80" />
 
-            {/* Bottom floating details card inside image */}
-            <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-md border border-white/10 p-4 rounded-xl z-20 flex justify-between items-center transition-all duration-500 group-hover:bg-[#0F1115]/85 group-hover:border-[#FF5C00]/30">
-              <div>
-                <span className="block text-white font-display text-xs font-bold tracking-wider">SHAH MAKHDUM</span>
-                <span className="block text-[9px] text-[#8A8A8A] uppercase tracking-widest font-mono">SYS_AI_ARCHITECT</span>
+                {/* Noise texture specifically inside frame */}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,92,0,0.1),transparent_50%)] z-10" />
+
+                {/* Profile image with subtle floating animation and failover placeholder */}
+                <div className="w-full h-full relative z-0 scale-100 transition-all duration-1000 group-hover:scale-105">
+                  <img
+                    src="/portrait.jpg"
+                    alt="Shah Makhdum — Software & AI Engineer"
+                    loading="eager"
+                    decoding="async"
+                    className="w-full h-full object-cover filter grayscale contrast-110 brightness-90 group-hover:grayscale-0 transition-all duration-700"
+                    onError={(e) => {
+                      // Last-resort fallback if /portrait.jpg is ever missing or blocked
+                      const target = e.target as HTMLImageElement;
+                      target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800&h=1000";
+                    }}
+                  />
+                </div>
+
+                {/* Bottom floating details card inside image */}
+                <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-md border border-white/10 p-4 rounded-xl z-20 flex justify-between items-center transition-all duration-500 group-hover:bg-[#0F1115]/85 group-hover:border-[#FF5C00]/30">
+                  <div>
+                    <span className="block text-white font-display text-xs font-bold tracking-wider">SHAH MAKHDUM</span>
+                    <span className="block text-[9px] text-[#8A8A8A] uppercase tracking-widest font-mono">SYS_AI_ARCHITECT</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <span className="w-1.5 h-1.5 bg-[#FF5C00] rounded-full" />
+                    <span className="text-[8px] text-[#FF5C00] font-mono tracking-widest font-bold">100% DISCIPLINE</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-1">
-                <span className="w-1.5 h-1.5 bg-[#FF5C00] rounded-full" />
-                <span className="text-[8px] text-[#FF5C00] font-mono tracking-widest font-bold">100% DISCIPLINE</span>
-              </div>
-            </div>
+            </ElectricBorder>
           </motion.div>
         </div>
       </div>
