@@ -55,21 +55,14 @@ export default function Navbar() {
     return unsubscribe;
   }, [scrollYProgress]);
 
-  // Stop Lenis (and body scroll) when the mobile drawer is open
+  // Lock body scroll while the mobile drawer is open. Don't stop Lenis —
+  // stopping it freezes lenis.scrollTo() so nav clicks appear dead.
   useEffect(() => {
-    if (!lenis) return;
-    if (isMobileMenuOpen) {
-      lenis.stop();
-      document.body.style.overflow = 'hidden';
-    } else {
-      lenis.start();
-      document.body.style.overflow = '';
-    }
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
     return () => {
-      lenis.start();
       document.body.style.overflow = '';
     };
-  }, [isMobileMenuOpen, lenis]);
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {

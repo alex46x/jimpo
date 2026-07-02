@@ -290,9 +290,9 @@ export default function Hero() {
           {/* Portrait Container wrapped in ElectricBorder */}
           <motion.div
             style={{ y: imageY, scale: imageScale }}
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={false}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="relative w-72 sm:w-80 lg:w-full max-w-[360px] aspect-[3/4] group shadow-2xl shadow-black/80"
           >
             <ElectricBorder
