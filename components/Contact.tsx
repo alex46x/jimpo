@@ -3,11 +3,14 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Mail, Phone, MessageSquare, ArrowRight, Check, Send } from 'lucide-react';
+import SectionLabel from './SectionLabel';
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSent, setIsSent] = useState(false);
+  // SR-only announcement that swaps in when the form transitions state.
+  const [statusAnnouncement, setStatusAnnouncement] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -17,14 +20,33 @@ export default function Contact() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
-    
+
+    // Build a real mailto: handoff so the message actually leaves the page
+    const subject = encodeURIComponent(`Portfolio inquiry from ${formData.name}`);
+    const body = encodeURIComponent(
+      `From: ${formData.name} <${formData.email}>\n\n${formData.message}`
+    );
+    const href = `mailto:contact.makhdum@gmail.com?subject=${subject}&body=${body}`;
+
     setIsSubmitting(true);
+    setStatusAnnouncement(
+      'Compiling transmission. Please wait while your message is being prepared.',
+    );
+    // Visual feedback window matches the prior fake-loading feel
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSent(true);
+      setStatusAnnouncement(
+        'Transmission completed successfully. Your message has been routed to the mail client.',
+      );
       setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setIsSent(false), 4000);
-    }, 1500);
+      // Hand off to the user's mail client
+      window.location.href = href;
+      setTimeout(() => {
+        setIsSent(false);
+        setStatusAnnouncement('');
+      }, 4000);
+    }, 700);
   };
 
   return (
@@ -41,18 +63,9 @@ export default function Contact() {
         
         {/* Section Header */}
         <div className="mb-16">
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center space-x-2.5 mb-4"
-          >
-            <span className="w-1.5 h-1.5 bg-[#FF5C00] rounded-full" />
-            <span className="font-mono text-xs text-[#FF5C00] font-bold tracking-[0.25em] uppercase">05 / TRANSACT</span>
-          </motion.div>
-          
-          <motion.h2 
+          <SectionLabel prefix="05" title="TRANSACT" className="mb-4" />
+
+          <motion.h2
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -133,7 +146,17 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Right Column: High-End Interactive Contact Form */}
+          {/* Screen-reader-only live region for status announcements */}
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {statusAnnouncement}
+      </div>
+
+      {/* Right Column: High-End Interactive Contact Form */}
           <motion.div 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}

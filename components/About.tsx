@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { MapPin, Coffee, Code2, Cpu, Compass } from 'lucide-react';
+import SectionLabel from './SectionLabel';
 
 export default function About() {
   const timelineData = [
@@ -46,18 +47,9 @@ export default function About() {
         
         {/* Section Header */}
         <div className="mb-20">
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center space-x-2.5 mb-4"
-          >
-            <span className="w-1.5 h-1.5 bg-[#FF5C00] rounded-full" />
-            <span className="font-mono text-xs text-[#FF5C00] font-bold tracking-[0.25em] uppercase">01 / DISCIPLINE</span>
-          </motion.div>
-          
-          <motion.h2 
+          <SectionLabel prefix="01" title="DISCIPLINE" className="mb-4" />
+
+          <motion.h2
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}

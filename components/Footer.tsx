@@ -2,6 +2,7 @@
 
 import React, { useRef } from 'react';
 import { motion, useMotionValue, useSpring } from 'motion/react';
+import { useLenis } from 'lenis/react';
 import { ArrowUp, Github, Linkedin } from 'lucide-react';
 
 interface MagneticProps {
@@ -52,11 +53,14 @@ function Magnetic({ children }: MagneticProps) {
 }
 
 export default function Footer() {
+  const lenis = useLenis();
+
   const handleScrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    if (lenis) {
+      lenis.scrollTo(0, { duration: 1.2 });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (

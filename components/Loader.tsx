@@ -7,6 +7,11 @@ interface LoaderProps {
   onComplete: () => void;
 }
 
+const STORAGE_KEY = 'makhdum:loaderPlayed';
+const REDUCED_MOTION =
+  typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 const words = ["INTELLIGENCE", "STRUCTURE", "SYNERGY", "CRAFT", "ELEGANCE", "PERFORMANCE"];
 
 export default function Loader({ onComplete }: LoaderProps) {
@@ -15,6 +20,14 @@ export default function Loader({ onComplete }: LoaderProps) {
   const [isDone, setIsDone] = useState(false);
 
   useEffect(() => {
+    // Skip the loader animation if the user has already seen it this session,
+    // or if they prefer reduced motion. The parent receives `onComplete` either way.
+    if (sessionStorage.getItem(STORAGE_KEY) || REDUCED_MOTION) {
+      sessionStorage.setItem(STORAGE_KEY, '1');
+      onComplete();
+      return;
+    }
+
     // Increment loading percentage with custom ease
     let start = 0;
     const duration = 2400; // 2.4 seconds total load
@@ -26,6 +39,7 @@ export default function Loader({ onComplete }: LoaderProps) {
       if (start >= 100) {
         start = 100;
         clearInterval(timer);
+        sessionStorage.setItem(STORAGE_KEY, '1');
         setTimeout(() => {
           setIsDone(true);
           setTimeout(() => {

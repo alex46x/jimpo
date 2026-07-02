@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown, Code, Server, Cpu, Wrench, Sparkles, Terminal } from 'lucide-react';
+import SectionLabel from './SectionLabel';
 
 interface Skill {
   name: string;
@@ -94,18 +95,9 @@ export default function Skills() {
         
         {/* Section Header */}
         <div className="mb-20">
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center space-x-2.5 mb-4"
-          >
-            <span className="w-1.5 h-1.5 bg-[#FF5C00] rounded-full" />
-            <span className="font-mono text-xs text-[#FF5C00] font-bold tracking-[0.25em] uppercase">02 / COMPETENCIES</span>
-          </motion.div>
-          
-          <motion.h2 
+          <SectionLabel prefix="02" title="COMPETENCIES" className="mb-4" />
+
+          <motion.h2
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}

@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useEffect, useState, useSyncExternalStore } from 'react';
+import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
+import { useLenis } from 'lenis/react';
 import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { useScrollTo } from '@/lib/use-scroll-to';
 
 const navItems = [
   { label: 'Home', href: '#home' },
@@ -16,6 +18,58 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const scrollTo = useScrollTo();
+  const lenis = useLenis();
+
+  // Track page-wide scroll progress for the top hairline indicator.
+  const { scrollYProgress } = useScroll();
+  const progressSpring = useSpring(scrollYProgress, {
+    stiffness: 220,
+    damping: 30,
+    mass: 0.4,
+  });
+
+  // Detect prefers-reduced-motion so the indicator snaps instead of tweening.
+  const reducedMotion = useSyncExternalStore(
+    (callback) => {
+      if (typeof window === 'undefined' || !window.matchMedia) return () => {};
+      const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+      mql.addEventListener('change', callback);
+      return () => mql.removeEventListener('change', callback);
+    },
+    () =>
+      typeof window !== 'undefined' && window.matchMedia
+        ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        : false,
+    () => false,
+  );
+
+  // Keep aria-valuenow in sync with the live progress value for screen readers.
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on('change', (latest) => {
+      const node = document.querySelector<HTMLElement>(
+        '[data-scroll-progressbar="true"]',
+      );
+      if (node) node.setAttribute('aria-valuenow', String(Math.round(latest * 100)));
+    });
+    return unsubscribe;
+  }, [scrollYProgress]);
+
+  // Stop Lenis (and body scroll) when the mobile drawer is open
+  useEffect(() => {
+    if (!lenis) return;
+    if (isMobileMenuOpen) {
+      lenis.stop();
+      document.body.style.overflow = 'hidden';
+    } else {
+      lenis.start();
+      document.body.style.overflow = '';
+    }
+    return () => {
+      lenis.start();
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen, lenis]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,16 +96,9 @@ export default function Navbar() {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     const targetId = href.substring(1);
-    const element = document.getElementById(targetId);
-    if (element) {
-      const topOffset = element.offsetTop - 80;
-      window.scrollTo({
-        top: topOffset,
-        behavior: 'smooth',
-      });
-      setActiveSection(targetId);
-      setIsMobileMenuOpen(false);
-    }
+    scrollTo(targetId);
+    setActiveSection(targetId);
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -64,9 +111,22 @@ export default function Navbar() {
         }}
         transition={{ duration: 0.3, ease: [0.25, 1, 0.5, 1] }}
       >
-        <div 
-          className="w-full max-w-5xl bg-black/40 backdrop-blur-md border border-white/8 rounded-full px-6 py-3 flex items-center justify-between pointer-events-auto transition-all duration-300 shadow-xl shadow-black/10"
+        <div
+          className="relative w-full max-w-5xl bg-black/40 backdrop-blur-md border border-white/8 rounded-full px-6 py-3 flex items-center justify-between pointer-events-auto transition-all duration-300 shadow-xl shadow-black/10"
         >
+          <motion.div
+            role="progressbar"
+            aria-label="Page scroll progress"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={0}
+            data-scroll-progressbar="true"
+            style={{
+              scaleX: reducedMotion ? scrollYProgress : progressSpring,
+              transformOrigin: '0% 50%',
+            }}
+            className="absolute left-0 right-0 -bottom-px h-[1.5px] rounded-full bg-gradient-to-r from-[#FF5C00] via-[#FF8A2D] to-[#FF5C00] origin-left will-change-transform"
+          />
           {/* Logo */}
           <a 
             href="#home" 

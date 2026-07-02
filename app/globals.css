@@ -17,7 +17,6 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
     background-color: #050505;
     color: #FFFFFF;
     -webkit-font-smoothing: antialiased;
@@ -28,7 +27,7 @@
     font-family: var(--font-inter), sans-serif;
     overflow-x: hidden;
   }
-  
+
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
@@ -43,6 +42,35 @@
   }
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 92, 0, 0.6);
+  }
+}
+
+/* Visually-hidden helper for screen-reader-only text (Tailwind v4 preflight doesn't ship it) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Respect reduced-motion users: kill infinite orbits, blur blooms, animated cursors */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .sunset-glow,
+  .sunset-glow-strong {
+    display: none;
   }
 }
 
@@ -85,12 +113,43 @@
 
 /* Text stroke for editorial typography */
 .text-stroke {
-  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.25);
   color: transparent;
+  transition: -webkit-text-stroke-color 0.4s ease, color 0.4s ease;
+}
+
+/* On hover the outline thickens and fills with accent via background-clip:text.
+   We layer two backgrounds: a static white outline (text-stroke) and an
+   accent fill that is clipped to text on hover only. */
+.text-stroke-hover {
+  background-image: linear-gradient(#FF5C00, #FF5C00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 0% 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.55s cubic-bezier(0.7, 0, 0.2, 1),
+    -webkit-text-stroke-color 0.4s ease;
 }
 
 .text-stroke-hover:hover {
-  -webkit-text-stroke: 1px #FF5C00;
-  transition: all 0.3s ease;
+  background-size: 100% 100%;
+  -webkit-text-stroke-color: transparent;
+}
+
+/* Cursor reading-aid on section headings — subtle horizontal sweep on first paint */
+@keyframes stroke-sweep {
+  0%   { background-size: 0% 100%; }
+  100% { background-size: 100% 100%; }
+}
+
+.text-stroke-sweep {
+  background-image: linear-gradient(#FF5C00, #FF5C00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-size: 0% 100%;
+  background-repeat: no-repeat;
+  -webkit-text-fill-color: transparent;
+  animation: stroke-sweep 1.4s cubic-bezier(0.7, 0, 0.2, 1) forwards;
+  animation-delay: 0.2s;
 }
 

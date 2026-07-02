@@ -3,8 +3,12 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { GraduationCap, Briefcase, Radio, Sparkles, Send } from 'lucide-react';
+import { useScrollTo } from '@/lib/use-scroll-to';
+import SectionLabel from './SectionLabel';
 
 export default function EducationAndExperience() {
+  const scrollTo = useScrollTo();
+
   const education = [
     {
       institution: "North Western University",
@@ -32,18 +36,9 @@ export default function EducationAndExperience() {
         
         {/* Editorial Title */}
         <div className="mb-20">
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center space-x-2.5 mb-4"
-          >
-            <span className="w-1.5 h-1.5 bg-[#FF5C00] rounded-full" />
-            <span className="font-mono text-xs text-[#FF5C00] font-bold tracking-[0.25em] uppercase">03 / TRACKS</span>
-          </motion.div>
-          
-          <motion.h2 
+          <SectionLabel prefix="03" title="TRACKS" className="mb-4" />
+
+          <motion.h2
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
@@ -163,10 +158,7 @@ export default function EducationAndExperience() {
 
             {/* Quick-action contact trigger */}
             <button
-              onClick={() => {
-                const el = document.getElementById('contact');
-                if (el) window.scrollTo({ top: el.offsetTop - 80, behavior: 'smooth' });
-              }}
+              onClick={() => scrollTo('contact')}
               className="w-full py-4 rounded-xl bg-white/5 hover:bg-[#FF5C00]/10 border border-white/8 hover:border-[#FF5C00]/30 text-white font-display text-xs font-bold tracking-widest uppercase transition-all duration-300 flex items-center justify-center space-x-2 group cursor-pointer"
             >
               <Send className="w-3.5 h-3.5 text-[#FF5C00] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />

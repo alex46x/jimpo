@@ -3,6 +3,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ExternalLink, Github, X, Code, ShieldCheck, Cpu, ArrowUpRight } from 'lucide-react';
+import SectionLabel from './SectionLabel';
+import SafeImage from './SafeImage';
+import { BRAND_BLUR } from '@/lib/image-placeholders';
+
+const PROJECT_FALLBACK =
+  'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1200&h=800';
 
 interface Project {
   id: string;
@@ -77,17 +83,7 @@ export default function Projects() {
         {/* Section Header */}
         <div className="mb-24 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div>
-            <motion.div 
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="flex items-center space-x-2.5 mb-4"
-            >
-              <span className="w-1.5 h-1.5 bg-[#FF5C00] rounded-full" />
-              <span className="font-mono text-xs text-[#FF5C00] font-bold tracking-[0.25em] uppercase">04 / CREATIONS</span>
-            </motion.div>
-            
+            <SectionLabel prefix="04" title="CREATIONS" className="mb-4" />
             <motion.h2 
               initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -130,15 +126,18 @@ export default function Projects() {
               <div className="lg:col-span-7 aspect-[16/10] overflow-hidden rounded-2xl relative border border-white/5 shadow-inner">
                 {/* Visual Glow overlay on hover */}
                 <div className="absolute inset-0 bg-[#FF5C00]/5 mix-blend-color-dodge opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none" />
-                <img
+                <SafeImage
                   src={project.image}
+                  fallbackSrc={PROJECT_FALLBACK}
                   alt={project.title}
+                  width={1200}
+                  height={800}
+                  loading="lazy"
+                  placeholder="blur"
+                  blurDataURL={BRAND_BLUR}
+                  sizes="(min-width: 1024px) 58vw, 100vw"
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover filter grayscale contrast-105 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1200&h=800";
-                  }}
                 />
               </div>
 
@@ -242,15 +241,18 @@ export default function Projects() {
                 {/* Hero Image inside page */}
                 <div className="aspect-[16/9] w-full overflow-hidden rounded-2xl border border-white/8 shadow-2xl relative">
                   <div className="absolute inset-0 bg-gradient-to-t from-[#050505] to-transparent opacity-40 z-10 pointer-events-none" />
-                  <img
+                  <SafeImage
                     src={selectedProject.image}
+                    fallbackSrc={PROJECT_FALLBACK}
                     alt={selectedProject.title}
+                    width={1200}
+                    height={675}
+                    loading="lazy"
+                    placeholder="blur"
+                    blurDataURL={BRAND_BLUR}
+                    sizes="(min-width: 1024px) 66vw, 100vw"
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover filter contrast-105"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1200&h=800";
-                    }}
                   />
                 </div>
 

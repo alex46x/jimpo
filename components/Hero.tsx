@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowDown, Github, Linkedin, FileText, ChevronRight } from 'lucide-react';
+import { useScrollTo } from '@/lib/use-scroll-to';
 
 const headingContainerVariants = {
   hidden: {},
@@ -49,28 +50,16 @@ export default function Hero() {
   const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
 
+  const scrollTo = useScrollTo();
+
   const handleScrollToWork = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const element = document.getElementById('projects');
-    if (element) {
-      const topOffset = element.offsetTop - 80;
-      window.scrollTo({
-        top: topOffset,
-        behavior: 'smooth',
-      });
-    }
+    scrollTo('projects');
   };
 
   const handleScrollToContact = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const element = document.getElementById('contact');
-    if (element) {
-      const topOffset = element.offsetTop - 80;
-      window.scrollTo({
-        top: topOffset,
-        behavior: 'smooth',
-      });
-    }
+    scrollTo('contact');
   };
 
   return (
@@ -162,8 +151,7 @@ export default function Hero() {
             <motion.h1 
               variants={headingContainerVariants}
               initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.1 }}
+              animate="visible"
               className="font-display font-black text-[12vw] sm:text-[8vw] lg:text-[5.5vw] leading-[1.0] text-white tracking-tight uppercase flex flex-col"
               style={{ perspective: 1000 }}
             >
@@ -224,8 +212,7 @@ export default function Hero() {
               href="#contact"
               onClick={(e) => {
                 e.preventDefault();
-                const el = document.getElementById('contact');
-                if (el) window.scrollTo({ top: el.offsetTop - 80, behavior: 'smooth' });
+                scrollTo('contact');
               }}
               className="px-6 py-3.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/8 text-white font-display text-xs font-bold tracking-widest uppercase transition-all duration-300 flex items-center gap-2 group cursor-pointer"
             >
@@ -234,12 +221,11 @@ export default function Hero() {
             </a>
             
             <a
-              href="#"
-              onClick={(e) => e.preventDefault()}
-              className="px-4 py-3.5 rounded-full text-[#8A8A8A] hover:text-white font-display text-xs font-semibold tracking-widest uppercase transition-colors flex items-center gap-1.5"
-              title="Resume Placeholder"
+              href="mailto:contact.makhdum@gmail.com?subject=Resume%20Request"
+              className="px-4 py-3.5 rounded-full text-[#8A8A8A] hover:text-white font-display text-xs font-semibold tracking-widest uppercase transition-colors flex items-center gap-1.5 group"
+              title="Request resume"
             >
-              <FileText className="w-4 h-4 text-[#FF5C00]" />
+              <FileText className="w-4 h-4 text-[#FF5C00] transition-transform duration-300 group-hover:rotate-[-6deg]" />
               <span>Resume</span>
             </a>
           </motion.div>
@@ -299,12 +285,13 @@ export default function Hero() {
             {/* Profile image with subtle floating animation and failover placeholder */}
             <div className="w-full h-full relative z-0 scale-100 transition-all duration-1000 group-hover:scale-105">
               <img
-                src="https://picsum.photos/seed/shah_makhdum/800/1000"
-                alt="Shah Makhdum"
-                referrerPolicy="no-referrer"
+                src="/portrait.jpg"
+                alt="Shah Makhdum — Software & AI Engineer"
+                loading="eager"
+                decoding="async"
                 className="w-full h-full object-cover filter grayscale contrast-110 brightness-90 group-hover:grayscale-0 transition-all duration-700"
                 onError={(e) => {
-                  // Fallback beautiful graphic if picsum gets rate limited
+                  // Last-resort fallback if /portrait.jpg is ever missing or blocked
                   const target = e.target as HTMLImageElement;
                   target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800&h=1000";
                 }}
